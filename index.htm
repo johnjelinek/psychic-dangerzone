@@ -7,7 +7,7 @@
 		<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js"></script>
 	</head>
 	<body>
-		<button id="add-video">Add Video</button>
+		<form>Add Video: <input id="add-video" type="text" /></form>
 		<div id="videos-list"></div>
 		<script type="text/javascript">
 		(function ($) {
@@ -17,7 +17,7 @@
 
 			Videos = Backbone.Collection.extend({
 				initialize: function (models, options) {
-					this.bind("add", options.view.addVideoLi);
+					this.bind("add", options.view.addVideoFrame);
 				}
 			});
 
@@ -27,14 +27,18 @@
 					this.videos = new Videos(null, { view: this });
 				},
 				events: {
-					"click #add-video": "showPrompt",
+					"keypress #add-video": "addVideo",
 				},
-				showPrompt: function () {
-					var video_url = prompt("What is the URL?");
-					var video_model = new Video({ url: video_url });
-					this.videos.add( video_model );
+				addVideo: function (e) {
+					if (e.keyCode == 13) { // Enter
+						var video_url = $("#add-video").val();
+						var video_model = new Video({ url: video_url });
+						this.videos.add( video_model );
+						$("#add-video").val('');
+						return false;
+					}
 				},
-				addVideoLi: function(model) {
+				addVideoFrame: function(model) {
 					$("#videos-list").append("<iframe id='ytplayer' type='text/html' width='640' height='390' src='" + model.get('url') + "' frameborder='0'/>");
 				}
 			});
